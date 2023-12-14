@@ -1,0 +1,35 @@
+server:
+  port: ${PORT:8181}
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<path>.*), /$\{path}
+        - id: users
+          uri: lb://users
+          predicates:
+            - Path=/users/**
+          filters:
+            - RewritePath=/users/(?<path>.*), /$\{path}
+        - id: tasks
+          uri: lb://tasks
+          predicates:
+            - Path=/tasks/**
+          filters:
+            - RewritePath=/tasks/(?<path>.*), /$\{path}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URI:http://localhost:8761/eureka/}
